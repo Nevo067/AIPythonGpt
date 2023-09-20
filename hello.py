@@ -6,6 +6,9 @@ from flask_cors import CORS
 import httpx
 import json
 
+
+from CustomClassLang.CustomLlm import CustomLLM
+
 app = Flask(__name__)
 CORS(app)
 url = "http://localhost:5000/api/v1/chat"
@@ -43,6 +46,14 @@ def test():
     res = httpx.post(url=url, data=data, headers=headers,timeout=10.0)
     print(res.text)
     return res.text
+
+@app.route("/testL", methods=['POST'])
+def testL():
+    data = request.get_json()
+    llm = CustomLLM()
+    text= llm(prompt= data["user_input"],history= data["history"])
+    return text
+
 
 
 if __name__ == '__main__':

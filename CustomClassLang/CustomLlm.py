@@ -21,14 +21,41 @@ from langchain.schema import messages_from_dict, messages_to_dict
 from langchain.vectorstores import Chroma
 from langchain.agents import load_tools
 from langchain.agents import initialize_agent
+import httpx
 
-class KoboldApiLLM(LLM):
+class CustomLLM(LLM):
+
+    
+
     @property
     def _llm_type(self) -> str:
         return "custom"
     
-    def _call(self, prompt: str, stop: List[str] | None = None, run_manager: CallbackManagerForLLMRun | None = None, **kwargs: Any) -> str:
-        return super()._call(prompt, stop, run_manager, **kwargs)
+    def _call(self, prompt: str, stop: List[str] | None = None, run_manager: CallbackManagerForLLMRun | None = None, history : List | None = None, **kwargs: Any) -> str:
+        
+        url = "http://localhost:5000/api/v1/chat"
+        print(history)
+        body ={
+            "user_input": prompt,
+            "max_new_tokens": 250,
+            "auto_max_new_tokens": False,
+            "history": history,
+            "mode": "chat",
+            "character": "Example",
+            "instruction_template": "Vicuna-v1.1",
+            "your_name": "You",
+            "regenerate": False,
+            "_continue": False,
+            "stop_at_newline": False,
+            "chat_generation_attempts": 1,
+            "chat_instruct_command": "Continue the chat dialogue below. Write a single reply for the character "
+        }
+        data = json.dumps(body)
+        headers = {"Content-Type": "application/json"}
+
+        res = httpx.post(url=url, data=data, headers=headers,timeout=10.0)
+
+        return res.text
     
     @property
     def _identifying_params(self) -> Mapping[str, Any]:
