@@ -3,8 +3,12 @@ from flask import Flask
 from flask import request
 
 from flask_cors import CORS
-from langchain.chains import ConversationChain
+import langchain
+from langchain.chains import ConversationChain,LLMChain
 from langchain.memory import ConversationSummaryMemory
+from langchain.prompts import PromptTemplate
+from langchain.llms import TextGen
+
 
 import httpx
 import json
@@ -14,7 +18,7 @@ from CustomClassLang.CustomLlm import CustomLLM
 
 app = Flask(__name__)
 CORS(app)
-url = "http://localhost:5000/api/v1/chat"
+url = "http://localhost:5000"
 
 
 @app.route("/")
@@ -52,18 +56,26 @@ def test():
 
 @app.route("/testL", methods=['POST'])
 def testL():
-    data = request.get_json()
-    llm = CustomLLM()
+    langchain.debug = True
 
+    template = """Question: {question} 
+    Answer : Let's think step by step"""
+
+    prompt = PromptTemplate(template=template,input_variables=["question"])
+    llm = TextGen(model_url=url)
+    chain = LLMChain(prompt=prompt,llm=llm)
+    data = request.get_json()
+    
+    ''' 
     conversation_with_summary = ConversationChain(
         llm=llm,
         memory=ConversationSummaryMemory(llm=llm,return_messages=True),
         verbose=True,
         
         )
-
+    '''  
     #text= llm(prompt= data["user_input"],history= data["history"])
-    return  conversation_with_summary.predict(input=data["user_input"])
+    return  chain.run(data["user_input"])
 
 
 
