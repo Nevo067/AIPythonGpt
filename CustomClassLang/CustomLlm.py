@@ -35,6 +35,9 @@ class CustomLLM(LLM):
         
         url = "http://localhost:5000/api/v1/chat"
         print(history)
+        if(history == None):
+            history = {"internal": [], "visible": []}
+        
         body ={
             "user_input": prompt,
             "max_new_tokens": 250,
@@ -53,7 +56,7 @@ class CustomLLM(LLM):
         data = json.dumps(body)
         headers = {"Content-Type": "application/json"}
 
-        res = httpx.post(url=url, data=data, headers=headers,timeout=10.0)
+        res = httpx.post(url=url, data=data, headers=headers,timeout=20.0)
 
         return res.text
     

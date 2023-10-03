@@ -3,6 +3,9 @@ from flask import Flask
 from flask import request
 
 from flask_cors import CORS
+from langchain.chains import ConversationChain
+from langchain.memory import ConversationSummaryMemory
+
 import httpx
 import json
 
@@ -51,8 +54,16 @@ def test():
 def testL():
     data = request.get_json()
     llm = CustomLLM()
-    text= llm(prompt= data["user_input"],history= data["history"])
-    return text
+
+    conversation_with_summary = ConversationChain(
+        llm=llm,
+        memory=ConversationSummaryMemory(llm=llm,return_messages=True),
+        verbose=True,
+        
+        )
+
+    #text= llm(prompt= data["user_input"],history= data["history"])
+    return  conversation_with_summary.predict(input=data["user_input"])
 
 
 
