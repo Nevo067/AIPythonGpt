@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, './Util')
+
 from flask import Flask
 
 from flask import request
@@ -13,21 +16,31 @@ from langchain.llms import TextGen
 import httpx
 import json
 
+from History import HistoryManager
+
 
 from CustomClassLang.CustomLlm import CustomLLM
 
+prefix_humain = "YOU";
+prefix_AI = "AI";
+history_manager = HistoryManager(prefix_AI,prefix_humain);
+
+## Init Langchain
 app = Flask(__name__)
 CORS(app)
 
+#DB
+
+
 url = "http://localhost:5000"
 llm = TextGen(model_url=url)
-memory = ConversationBufferMemory(llm=llm,human_prefix="USER",ai_prefix="ATOM")
+memory = ConversationBufferMemory(llm=llm,human_prefix=prefix_humain,ai_prefix=prefix_AI)
 # summure Conversation's History
 history = ChatMessageHistory()
-memory1 = ConversationSummaryMemory(llm=llm,human_prefix="USER",ai_prefix="YOU",chat_memory=history)
+memory1 = ConversationSummaryMemory(llm=llm,human_prefix="YOU",ai_prefix="ATOM",chat_memory=history)
 
 
-
+## Template 
 
 template = """ 
 Atom's Persona: You are a chatbot having a conversation with a human
@@ -44,11 +57,28 @@ YOU: {input}
 ATOM:
 """
 
-prompt = PromptTemplate(template=template,input_variables=["history","input"])
+templateSummury ="""
+Atom's Persona: You are a chatbot having a conversation with a human.
+{history}
+<START>
+[DIALOGUE HISTORY]
+
+YOU: Salut
+ATOM: Bonjour comment puis-je vous aider ?
+YOU: J'aimerais connaitre ton zelda préferé
+ATOM: J'adore Skyward sword. 
+
+
+YOU: {input}
+ATOM: 
+
+"""
+
+prompt = PromptTemplate(template=templateSummury,input_variables=["history","input"])
 
 conversation_with_summary = ConversationChain(
         llm=llm,
-        memory=memory1,
+        memory=memory,
         prompt=prompt,
         verbose=True,
         )
@@ -93,7 +123,7 @@ def test():
 def testL():
     
     data = request.get_json()
-
+    history_manager.add_humain_message(data["user_input"])
     
     #Langchain
     ''' V1
@@ -124,7 +154,11 @@ def testL():
     
 
     #text= llm(prompt= data["user_input"],history= data["history"])
-    return  conversation_with_summary.predict(input=data["user_input"])
+    rep = conversation_with_summary.predict(input=data["user_input"])
+    history_manager.add_ai_message(rep)
+    print(history_manager.history)
+
+    return rep
 
 
 
