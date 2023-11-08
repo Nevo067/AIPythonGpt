@@ -6,6 +6,14 @@ from flask import Flask
 from flask import request
 
 from flask_cors import CORS
+
+import chromadb
+from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.vectorstores import Chroma
+from langchain.document_loaders import TextLoader
+
+
 import langchain
 from langchain.chains import ConversationChain,LLMChain
 from langchain.memory import ConversationSummaryMemory,ConversationSummaryBufferMemory,ConversationBufferMemory,ChatMessageHistory
@@ -24,12 +32,26 @@ from CustomClassLang.CustomLlm import CustomLLM
 prefix_humain = "YOU";
 prefix_AI = "AI";
 history_manager = HistoryManager(prefix_AI,prefix_humain);
+persit_directory = "./DatabaseChroma/chroma_db"
 
 ## Init Langchain
 app = Flask(__name__)
 CORS(app)
 
 #DB
+loader = TextLoader("./DatabaseChroma/test.txt")
+document = loader.load();
+
+print(document);
+
+text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+docs = text_splitter.split_documents(document)
+
+
+
+embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+db_chroma = Chroma(embedding_function=embedding_function,persist_directory=persit_directory)
+
 
 
 url = "http://localhost:5000"
@@ -50,7 +72,9 @@ Atom's Persona: You are a chatbot having a conversation with a human
 YOU: Salut
 ATOM: Bonjour comment puis-je vous aider ?
 YOU: J'aimerais connaitre ton zelda préferé
-ATOM: J'adore Skyward sword. 
+ATOM: J'adore Skyward sword.
+
+
 {history}
 
 YOU: {input}
@@ -74,13 +98,14 @@ ATOM:
 
 """
 
-prompt = PromptTemplate(template=templateSummury,input_variables=["history","input"])
+prompt = PromptTemplate(template=template,input_variables=["history","input"])
 
 conversation_with_summary = ConversationChain(
         llm=llm,
         memory=memory,
         prompt=prompt,
         verbose=True,
+        
         )
 
 
@@ -151,12 +176,20 @@ def testL():
         
         )
     '''  
+
     
+    
+    docsQuery = db_chroma.similarity_search(data["user_input"],k=1)
+    print(docsQuery[0]);
+
+    print(docsQuery[0].page_content);
+    memory.chat_memory.add_user_message(docsQuery[0].page_content)
 
     #text= llm(prompt= data["user_input"],history= data["history"])
     rep = conversation_with_summary.predict(input=data["user_input"])
     history_manager.add_ai_message(rep)
-    print(history_manager.history)
+    
+    #print(history_manager.history)
 
     return rep
 

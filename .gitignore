@@ -1,0 +1,7 @@
+DatabaseChroma/test.txt
+DatabaseChroma/chroma_db/chroma-collections.parquet
+DatabaseChroma/chroma_db/chroma-embeddings.parquet
+DatabaseChroma/chroma_db/index/id_to_uuid_e3d68d9c-2cae-4111-aa21-170a9dbcd3f7.pkl
+DatabaseChroma/chroma_db/index/index_e3d68d9c-2cae-4111-aa21-170a9dbcd3f7.bin
+DatabaseChroma/chroma_db/index/index_metadata_e3d68d9c-2cae-4111-aa21-170a9dbcd3f7.pkl
+DatabaseChroma/chroma_db/index/uuid_to_id_e3d68d9c-2cae-4111-aa21-170a9dbcd3f7.pkl
