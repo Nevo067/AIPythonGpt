@@ -107,7 +107,7 @@ conversation_with_summary = ConversationChain(
         llm=llm,
         memory=memory,
         prompt=prompt,
-        
+        verbose=True
         
         )
 
@@ -186,8 +186,9 @@ def testL():
     
     
 
-    #print(docsQuery[0].page_content);
+    print(docsQuery[0].page_content);
     memory.chat_memory.add_user_message(docsQuery[0].page_content)
+    
 
     #text= llm(prompt= data["user_input"],history= data["history"])
     rep = conversation_with_summary.predict(input=data["user_input"])
@@ -198,18 +199,37 @@ def testL():
     newMessage = history_manager.get_two_last_String()
     #print(history_manager.get_two_last_String());
     #updateDoc = history_manager.get_history()[nb_message-1] + history_manager.get_history()[nb_message-2]
-    print(newMessage)
+    #print(newMessage)
     doc = Document(page_content=newMessage,
         metadata={
             "source": "ai",
             }
         )
+    # get update str
+    updateCol = db_chroma.get("dee0665f-7e04-11ee-8c73-c87f54925d7e");
+    
+    updateDoc = updateCol["documents"]
+    update_str = updateDoc[0] +"\n"+newMessage;
+    
+    # update 
+    updateCol["documents"] = update_str;
 
+    doc = Document(page_content=update_str,
+        metadata={
+            "source": "ai",
+            }
+        )
 
+    print(updateCol)
+    
+    db_chroma.update_document("dee0665f-7e04-11ee-8c73-c87f54925d7e",doc)
+
+    updateCol = db_chroma.get("dee0665f-7e04-11ee-8c73-c87f54925d7e");
+    updateDoc = updateCol["documents"]
+    print(updateDoc)
 
     '''
-    updateCol = db_chroma.get("dee0665f-7e04-11ee-8c73-c87f54925d7e");
-    #print(updateCol["documents"]);
+    
     
     update_document = updateCol["documents"]
     update_document.append(data["user_input"])

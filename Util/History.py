@@ -33,16 +33,16 @@ class HistoryManager:
 
     def get_string_message(self,message):
         """
-        The function `get_string_message` takes a message dictionary as input and returns a string
-        representation of the message.
+        The function `get_string_message` takes a message dictionary as input and returns a formatted
+        string message based on the presence of a human or AI prefix in the message.
         
-        :param message: The "message" parameter is a dictionary that contains two keys: "ai_prefix" and
-        "humain_prefix". The values associated with these keys are strings
+        :param message: The `message` parameter is a dictionary that contains two keys:
+        `self.humain_prefix` and `self.ai_prefix`. The values associated with these keys are strings
         :return: a string message.
         """
         strs = ""
 
-        if(message[self.ai_prefix] in message):
+        if(self.humain_prefix in message):
             strs = self.humain_prefix +" : "+message[self.humain_prefix]
         else:
             strs = self.ai_prefix +" : "+message[self.ai_prefix]
@@ -52,13 +52,21 @@ class HistoryManager:
         
 
     def get_two_last_String(self):
+        """
+        The function `get_two_last_String` returns a concatenated string of the two most recent messages
+        in the chat history.
+        :return: a string that contains the text of the second to last message and the last message in
+        the chat history.
+        """
         nb = len(self.history)
         message = self.get_history()[nb-2];
         message1 = self.get_history()[nb-1];
         
-        self.get_string_message()
+        messageText = self.get_string_message(message=message)
+        messageText1 = self.get_string_message(message=message1)
+        
 
-        newText = messageText+" /n "+messageText1
+        newText = messageText+" \n"+messageText1
 
         return newText
  
