@@ -11,4 +11,31 @@ class HistoryManager:
         self.history.append({self.ai_prefix : message})
 
     def get_history(self):
-        return self.history;    
+        return self.history;
+
+    def get_string_message(self,message):
+        strs = ""
+
+        if(message[self.ai_prefix] is None):
+            strs = self.humain_prefix +" : "+message[self.humain_prefix]
+        else:
+            strs = self.ai_prefix +" : "+message[self.ai_prefix]
+        
+        return strs
+
+        
+
+    def get_two_last_String(self):
+        nb = len(self.history)
+        message = self.get_history()[nb-1];
+        message1 = self.get_history()[nb-2];
+
+        messageText = ', '.join([str(dic) for dic in message]) 
+        messageText1 = ', '.join([str(dic) for dic in message1])
+
+        newText = messageText+" /n "+messageText1
+
+        return newText
+ 
+
+            

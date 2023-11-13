@@ -12,6 +12,7 @@ from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddi
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.document_loaders import TextLoader
+from langchain.schema import Document
 
 
 import langchain
@@ -29,6 +30,8 @@ from History import HistoryManager
 
 from CustomClassLang.CustomLlm import CustomLLM
 
+
+
 prefix_humain = "YOU";
 prefix_AI = "AI";
 history_manager = HistoryManager(prefix_AI,prefix_humain);
@@ -42,7 +45,7 @@ CORS(app)
 loader = TextLoader("./DatabaseChroma/test.txt")
 document = loader.load();
 
-print(document);
+#print(document);
 
 text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
 docs = text_splitter.split_documents(document)
@@ -104,7 +107,7 @@ conversation_with_summary = ConversationChain(
         llm=llm,
         memory=memory,
         prompt=prompt,
-        verbose=True,
+        
         
         )
 
@@ -180,16 +183,41 @@ def testL():
     
     
     docsQuery = db_chroma.similarity_search(data["user_input"],k=1)
-    print(docsQuery[0]);
+    
+    
 
-    print(docsQuery[0].page_content);
+    #print(docsQuery[0].page_content);
     memory.chat_memory.add_user_message(docsQuery[0].page_content)
 
     #text= llm(prompt= data["user_input"],history= data["history"])
     rep = conversation_with_summary.predict(input=data["user_input"])
+
     history_manager.add_ai_message(rep)
+    tab = history_manager.get_history()
+    nb_message = len(tab);
+    newMessage = history_manager.get_two_last_String()
+    #print(history_manager.get_two_last_String());
+    #updateDoc = history_manager.get_history()[nb_message-1] + history_manager.get_history()[nb_message-2]
+    print(newMessage)
+    doc = Document(page_content=newMessage,
+        metadata={
+            "source": "ai",
+            }
+        )
+
+
+
+    '''
+    updateCol = db_chroma.get("dee0665f-7e04-11ee-8c73-c87f54925d7e");
+    #print(updateCol["documents"]);
     
+    update_document = updateCol["documents"]
+    update_document.append(data["user_input"])
+    update_document.append(rep)
+    #print(update_document);
+    db_chroma.update_document("dee0665f-7e04-11ee-8c73-c87f54925d7e",update_document)
     #print(history_manager.history)
+    '''
 
     return rep
 
