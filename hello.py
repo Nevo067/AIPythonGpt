@@ -12,7 +12,7 @@ from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddi
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.document_loaders import TextLoader
-from langchain.schema import Document
+from langchain.schema import Document,BaseMessage
 
 
 import langchain
@@ -184,10 +184,12 @@ def testL():
     
     docsQuery = db_chroma.similarity_search(data["user_input"],k=1)
     
-    
 
-    print(docsQuery[0].page_content);
+    test = BaseMessage(content=docsQuery[0].page_content,type="test")
+    
+    #print(docsQuery);
     memory.chat_memory.add_user_message(docsQuery[0].page_content)
+    history_manager.transform_text_to_dict("AI","YOU",docsQuery[0].page_content)
     
 
     #text= llm(prompt= data["user_input"],history= data["history"])
@@ -220,13 +222,13 @@ def testL():
             }
         )
 
-    print(updateCol)
+    #print(updateCol)
     
     db_chroma.update_document("dee0665f-7e04-11ee-8c73-c87f54925d7e",doc)
 
     updateCol = db_chroma.get("dee0665f-7e04-11ee-8c73-c87f54925d7e");
     updateDoc = updateCol["documents"]
-    print(updateDoc)
+    #print(updateDoc)
 
     '''
     
