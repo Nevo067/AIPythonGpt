@@ -74,12 +74,13 @@ class HistoryManager:
     def transform_text_to_dict(self,ai, humain, message):
         new_dict = [];
         newText = message.split("\n")
-
+        
         for textMessage in newText :
             text_message_part= textMessage.split(":")
-            new_str_message = '{"' +text_message_part[0] +'":"'+ text_message_part[1] + '"}'
-            dict_message = json.loads(new_str_message)
-            new_dict.append(dict_message)
+            if len(text_message_part) == 2:
+                new_str_message = '{"' +text_message_part[0] +'":"'+ text_message_part[1] + '"}'
+                dict_message = json.loads(new_str_message)
+                new_dict.append(dict_message)
         print(new_dict)
         return new_dict
         

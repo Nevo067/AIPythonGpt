@@ -189,7 +189,6 @@ def testL():
     
     #print(docsQuery);
     memory.chat_memory.add_user_message(docsQuery[0].page_content)
-    history_manager.transform_text_to_dict("AI","YOU",docsQuery[0].page_content)
     
 
     #text= llm(prompt= data["user_input"],history= data["history"])
@@ -211,7 +210,13 @@ def testL():
     updateCol = db_chroma.get("dee0665f-7e04-11ee-8c73-c87f54925d7e");
     
     updateDoc = updateCol["documents"]
+
+    #print(updateDoc)
+
     update_str = updateDoc[0] +"\n"+newMessage;
+
+    testH= history_manager.transform_text_to_dict("AI","YOU",updateDoc[0])
+    #print(testH)
     
     # update 
     updateCol["documents"] = update_str;
@@ -222,6 +227,8 @@ def testL():
             }
         )
 
+    ## The `print` function in Python is used to display output on the console. It takes one or more
+    # arguments and prints them as text.
     #print(updateCol)
     
     db_chroma.update_document("dee0665f-7e04-11ee-8c73-c87f54925d7e",doc)
