@@ -47,7 +47,7 @@ document = loader.load();
 
 #print(document);
 
-text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0)
 docs = text_splitter.split_documents(document)
 
 
@@ -159,74 +159,29 @@ def testL():
     data = request.get_json()
     history_manager.add_humain_message(data["user_input"])
     
-    #Langchain
-    ''' V1
-    langchain.debug = True
+    #Get text
+    text_doc =""
+    docsQuery = db_chroma.similarity_search(data["user_input"],k=2)
 
-    template = """Question: {question} 
-        Answer : Let's think step by step"""
-
-    prompt = PromptTemplate(template=template,input_variables=["question"])
-    llm = TextGen(model_url=url)
-    chain = LLMChain(prompt=prompt,llm=llm)
-    conversation_with_summary = ConversationChain(
-        llm=llm,
-        memory=ConversationSummaryBufferMemory(llm=llm, max_token_limit=128),
-        verbose=True,
-    )
-
-    '''
-
-    ''' 
-    conversation_with_summary = ConversationChain(
-        llm=llm,
-        memory=ConversationSummaryMemory(llm=llm,return_messages=True),
-        verbose=True,
-        
-        )
-    '''  
-
+    for page_content in docsQuery:
+        text_doc += page_content.page_content
     
-    
-    docsQuery = db_chroma.similarity_search(data["user_input"],k=1)
-    
+    #Add document to text
+    doc_dict= history_manager.transform_text_to_dict("YOU","AI",text_doc)
 
-    test = BaseMessage(content=docsQuery[0].page_content,type="test")
-    
-    #print(docsQuery);
-    memory.chat_memory.add_user_message(docsQuery[0].page_content)
-    
-
-    #text= llm(prompt= data["user_input"],history= data["history"])
-    
-    #rep = conversation_with_summary.predict(input={"input":data["user_input"],'tests':"BOOM"})
-    rep = conversation_with_summary.predict(humain_input= data["user_input"],tests= "Valeur_de_tests")
+    rep = conversation_with_summary.predict(humain_input= data["user_input"],tests=text_doc)
 
     history_manager.add_ai_message(rep)
-    tab = history_manager.get_history()
-    nb_message = len(tab);
-    newMessage = history_manager.get_two_last_String()
-    #print(history_manager.get_two_last_String());
-    #updateDoc = history_manager.get_history()[nb_message-1] + history_manager.get_history()[nb_message-2]
-    #print(newMessage)
-    doc = Document(page_content=newMessage,
-        metadata={
-            "source": "ai",
-            }
-        )
-    # get update str
-    updateCol = db_chroma.get("dee0665f-7e04-11ee-8c73-c87f54925d7e");
-    
-    updateDoc = updateCol["documents"]
 
+    newMessage = history_manager.get_two_last_String()
     #print(updateDoc)
 
-    update_str = updateDoc[0] +"\n"+newMessage;
-
+    print(newMessage)
     
     #print(testH)
     
     # update 
+    '''
     updateCol["documents"] = update_str;
 
     doc = Document(page_content=update_str,
@@ -246,6 +201,21 @@ def testL():
     updateCol = db_chroma.get("dee0665f-7e04-11ee-8c73-c87f54925d7e");
     updateDoc = updateCol["documents"]
     #print(updateDoc)
+
+    '''
+
+    doc = Document(page_content=newMessage,
+        metadata={
+            "source": "test ai",
+            }
+        )
+    doc_list = []
+    doc_list.append(doc)
+    db_chroma.add_documents(documents=doc_list)
+    print(db_chroma.get())
+    
+
+
 
     '''
     
