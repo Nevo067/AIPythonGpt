@@ -59,7 +59,7 @@ db_chroma = Chroma(embedding_function=embedding_function,persist_directory=persi
 
 url = "http://localhost:5000"
 llm = TextGen(model_url=url)
-memory = ConversationBufferMemory(llm=llm,human_prefix=prefix_humain,ai_prefix=prefix_AI)
+memory = ConversationBufferMemory(human_prefix=prefix_humain,ai_prefix=prefix_AI,memory_key="history",input_key="humain_input")
 # summure Conversation's History
 history = ChatMessageHistory()
 memory1 = ConversationSummaryMemory(llm=llm,human_prefix="YOU",ai_prefix="ATOM",chat_memory=history)
@@ -72,15 +72,18 @@ Atom's Persona: You are a chatbot having a conversation with a human
 <START>
 [DIALOGUE HISTORY]
 
+{tests}
+
 YOU: Salut
 ATOM: Bonjour comment puis-je vous aider ?
 YOU: J'aimerais connaitre ton zelda préferé
 ATOM: J'adore Skyward sword.
 
 
+
 {history}
 
-YOU: {input}
+YOU: {humain_input}
 ATOM:
 """
 
@@ -89,6 +92,8 @@ Atom's Persona: You are a chatbot having a conversation with a human.
 {history}
 <START>
 [DIALOGUE HISTORY]
+
+
 
 YOU: Salut
 ATOM: Bonjour comment puis-je vous aider ?
@@ -101,15 +106,16 @@ ATOM:
 
 """
 
-prompt = PromptTemplate(template=template,input_variables=["history","input"])
+prompt = PromptTemplate(template=template,input_variables=["history","humain_input","tests"])
 
-conversation_with_summary = ConversationChain(
-        llm=llm,
-        memory=memory,
-        prompt=prompt,
-        verbose=True
-        
-        )
+
+
+conversation_with_summary = LLMChain(
+    llm=llm,
+    memory=memory,
+    prompt=prompt,
+    verbose=True
+    )
 
 
 
@@ -192,7 +198,9 @@ def testL():
     
 
     #text= llm(prompt= data["user_input"],history= data["history"])
-    rep = conversation_with_summary.predict(input=data["user_input"])
+    
+    #rep = conversation_with_summary.predict(input={"input":data["user_input"],'tests':"BOOM"})
+    rep = conversation_with_summary.predict(humain_input= data["user_input"],tests= "Valeur_de_tests")
 
     history_manager.add_ai_message(rep)
     tab = history_manager.get_history()
@@ -215,7 +223,7 @@ def testL():
 
     update_str = updateDoc[0] +"\n"+newMessage;
 
-    testH= history_manager.transform_text_to_dict("AI","YOU",updateDoc[0])
+    
     #print(testH)
     
     # update 
@@ -226,6 +234,8 @@ def testL():
             "source": "ai",
             }
         )
+
+    testH= history_manager.transform_text_to_dict("AI","YOU",update_str)
 
     ## The `print` function in Python is used to display output on the console. It takes one or more
     # arguments and prints them as text.
