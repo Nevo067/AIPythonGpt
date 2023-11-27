@@ -5,19 +5,45 @@ from langchain.vectorstores import Chroma
 from langchain.document_loaders import TextLoader
 from langchain.schema import Document,BaseMessage
 
-persit_directory = "./DatabaseChroma/chroma_db"
+def delete():
 
-loader = TextLoader("./DatabaseChroma/test.txt")
-document = loader.load();
+    persit_directory = "./DatabaseChroma/chroma_db"
 
-#print(document);
+    loader = TextLoader("./DatabaseChroma/test.txt")
+    document = loader.load();
 
-text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0)
-docs = text_splitter.split_documents(document)
+    #print(document);
+
+    text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+    docs = text_splitter.split_documents(document)
 
 
 
-embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-db_chroma = Chroma(embedding_function=embedding_function,persist_directory=persit_directory)
+    embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    db_chroma = Chroma(embedding_function=embedding_function,persist_directory=persit_directory)
 
-db_chroma.delete("dee0665f-7e04-11ee-8c73-c87f54925d7e")
+    col = db_chroma.get()
+    print()
+
+    db_chroma.delete(col["ids"])
+
+def see_database():
+    persit_directory = "./DatabaseChroma/chroma_db"
+
+    loader = TextLoader("./DatabaseChroma/test.txt")
+    document = loader.load();
+
+    #print(document);
+
+    text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+    docs = text_splitter.split_documents(document)
+
+
+
+    embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+    db_chroma = Chroma(embedding_function=embedding_function,persist_directory=persit_directory)
+
+    col = db_chroma.get()
+    print(col)
+
+see_database()

@@ -33,8 +33,8 @@ from CustomClassLang.CustomLlm import CustomLLM
 
 
 prefix_humain = "YOU";
-prefix_AI = "AI";
-history_manager = HistoryManager(prefix_AI,prefix_humain);
+prefix_AI = "ATOM";
+history_manager = HistoryManager(prefix_AI,prefix_humain,4);
 persit_directory = "./DatabaseChroma/chroma_db"
 
 ## Init Langchain
@@ -54,6 +54,7 @@ docs = text_splitter.split_documents(document)
 
 embedding_function = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 db_chroma = Chroma(embedding_function=embedding_function,persist_directory=persit_directory)
+db_chroma = db_chroma.as_retriever(search_type = "mmr")
 
 
 
@@ -65,6 +66,8 @@ history = ChatMessageHistory()
 memory1 = ConversationSummaryMemory(llm=llm,human_prefix="YOU",ai_prefix="ATOM",chat_memory=history)
 
 
+
+
 ## Template 
 
 template = """ 
@@ -74,18 +77,16 @@ Atom's Persona: You are a chatbot having a conversation with a human
 
 {tests}
 
-YOU: Salut
-ATOM: Bonjour comment puis-je vous aider ?
-YOU: J'aimerais connaitre ton zelda préferé
-ATOM: J'adore Skyward sword.
-
-
 
 {history}
 
 YOU: {humain_input}
 ATOM:
 """
+
+
+
+
 
 templateSummury ="""
 Atom's Persona: You are a chatbot having a conversation with a human.
@@ -114,7 +115,7 @@ conversation_with_summary = LLMChain(
     llm=llm,
     memory=memory,
     prompt=prompt,
-    verbose=True
+    verbose=True    
     )
 
 
@@ -161,10 +162,12 @@ def testL():
     
     #Get text
     text_doc =""
-    docsQuery = db_chroma.similarity_search(data["user_input"],k=2)
-
+    
+    docsQuery = db_chroma.get_relevant_documents(data["user_input"])
+    print(docsQuery)
+    
     for page_content in docsQuery:
-        text_doc += page_content.page_content
+        text_doc += (page_content.page_content+"\n")
     
     #Add document to text
     doc_dict= history_manager.transform_text_to_dict("YOU","AI",text_doc)
@@ -177,6 +180,7 @@ def testL():
     #print(updateDoc)
 
     print(newMessage)
+    
     
     #print(testH)
     
@@ -204,15 +208,18 @@ def testL():
 
     '''
 
-    doc = Document(page_content=newMessage,
-        metadata={
-            "source": "test ai",
-            }
-        )
-    doc_list = []
-    doc_list.append(doc)
-    db_chroma.add_documents(documents=doc_list)
-    print(db_chroma.get())
+    
+    if history_manager.counting(1):
+        text = history_manager.get_number_message(4)
+        doc = Document(page_content=text,
+            metadata={
+                "source": "test ai",
+                }
+            )
+        doc_list = []
+        doc_list.append(doc)
+        db_chroma.add_documents(documents=doc_list)
+        #print(db_chroma.get())
     
 
 

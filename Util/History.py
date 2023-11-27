@@ -1,9 +1,11 @@
 import json
 class HistoryManager:
-    def __init__(self,ai_prefix,humain_prefix) -> None:
+    def __init__(self,ai_prefix,humain_prefix,count_limit) -> None:
         self.history = [];
         self.ai_prefix = ai_prefix;
         self.humain_prefix = humain_prefix;
+        self.count_limit = count_limit
+        self.count = count_limit;
 
     def add_humain_message(self,message:str):
         """
@@ -72,6 +74,19 @@ class HistoryManager:
         return newText
     
     def transform_text_to_dict(self,ai, humain, message):
+        """
+        The function `transform_text_to_dict` takes in three parameters (ai, humain, message), splits
+        the message into separate lines, splits each line into key-value pairs, converts each pair into
+        a dictionary, and appends the dictionaries to a list before returning the list.
+        
+        :param ai: The "ai" parameter represents the AI component or entity
+        :param humain: The `humain` parameter is a string that represents the name or identifier of a
+        human
+        :param message: The `message` parameter is a string that contains multiple lines of text. Each
+        line represents a key-value pair separated by a colon (:). The key and value are separated by a
+        colon (:)
+        :return: a list of dictionaries.
+        """
         new_dict = [];
         newText = message.split("\n")
         
@@ -83,7 +98,45 @@ class HistoryManager:
                 new_dict.append(dict_message)
         print(new_dict)
         return new_dict
+    
+    def is_count_equals_0(self):
+        """
+        The function checks if the count limit is equal to 0 and returns True if it is, otherwise it
+        returns False.
+        :return: a boolean value. If the count_limit is less than or equal to 0, it will return True.
+        Otherwise, it will return False.
+        """
+        if self.count <= 0:
+            return True 
+        else:
+            return False
+    
+    def counting(self,nb_count):
+        """
+        The function "counting" takes a number as input and subtracts it from the count variable,
+        returning False if the count is not equal to 0, and True if it is.
         
+        :param nb_count: The parameter `nb_count` represents the number by which the count should be
+        decreased
+        :return: a boolean value. If the condition `self.is_count_equals_0()` is true, then the function
+        returns `True`. Otherwise, it returns `False`.
+        """
+        print(self.count)
+        if self.is_count_equals_0():
+            self.count = self.count_limit
+            return True
+        else:
+            self.count -= nb_count
+            return False
+        
+    def get_number_message(self,nb_messages):
+        historyLength = len(self.history)
+        text =""
+        for i in range(historyLength-(nb_messages + 1),historyLength):
+            message = self.history[i]
+            text += self.get_string_message(message=message) +"\n"
+        
+        return text
          
  
 
