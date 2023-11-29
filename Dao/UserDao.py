@@ -36,6 +36,24 @@ class UserDao():
         self.db.Close_connection()
 
         return newUser
+    
+    def Is_user_exist(self,login:str,password:str = None):
+        
+        query = {"login":login,"password":password}
+        
+        self.db.Open_connection()
+        dbN = self.db.dbClient[self.databasesName]
+        col = dbN[self.collection_name]
+
+        user = col.find_one(query)
+
+        if user != None:
+            return True
+        else:
+            return False
+
+
+
 
 
         

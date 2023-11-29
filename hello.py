@@ -255,6 +255,9 @@ def testL():
 
     return rep
 
+
+#User Routes
+
 @app.route("/User",methods=['POST'])
 def userPost():
     Dao= UserDao(mongo_db,"TestAi","User")
@@ -263,6 +266,17 @@ def userPost():
     print(newUser)
     return "bip"
 
+@app.route("/Connexion",methods=['POST'])
+def Connexion():
+    Dao= UserDao(mongo_db,"TestAi","User")
+    input_user= request.get_json()
+    is_connect = Dao.Is_user_exist(input_user["login"],input_user["password"])
+    
+    if is_connect:
+        return "Connecté"
+    else:
+        return "Non Connecté"
+    
 
 
 if __name__ == '__main__':
