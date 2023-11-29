@@ -1,5 +1,6 @@
 import sys
-sys.path.insert(0, './Util')
+sys.path.insert(0,'./Util')
+sys.path.insert(0,'./Dao')
 
 from flask import Flask
 
@@ -26,9 +27,26 @@ import httpx
 import json
 
 from History import HistoryManager
+from DbApi import DbApi
+from UserDao import UserDao
+
+
+
 
 
 from CustomClassLang.CustomLlm import CustomLLM
+
+
+
+
+#MongoDb
+
+mgdb_host_name = "localhost"
+mgdb_port =""
+mgdb_databases_name = "" 
+
+
+mongo_db = DbApi(mgdb_host_name)
 
 
 
@@ -236,6 +254,14 @@ def testL():
     '''
 
     return rep
+
+@app.route("/User",methods=['POST'])
+def userPost():
+    Dao= UserDao(mongo_db,"TestAi","User")
+    input_user= request.get_json()
+    newUser =Dao.AddUser(input_user["login"],input_user["password"])
+    print(newUser)
+    return "bip"
 
 
 
