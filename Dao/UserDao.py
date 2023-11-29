@@ -10,6 +10,18 @@ class UserDao():
         self.collection_name = collection_name
 
     def AddUser(self,login:str,password:str):
+        """
+        The function `AddUser` adds a new user to a database collection with the provided login and
+        password.
+        
+        :param login: The login parameter is a string that represents the username or login name of the
+        user you want to add to the database
+        :type login: str
+        :param password: The password parameter is a string that represents the password for the user
+        :type password: str
+        :return: the result of the `insert_one` operation, which is an instance of the `InsertOneResult`
+        class.
+        """
         self.db.Open_connection()
 
         user = {

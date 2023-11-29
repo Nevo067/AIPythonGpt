@@ -130,6 +130,16 @@ class HistoryManager:
             return False
         
     def get_number_message(self,nb_messages):
+        """
+        The function `get_number_message` returns a string containing the last `nb_messages` messages
+        from a history list.
+        
+        :param nb_messages: The parameter "nb_messages" represents the number of messages you want to
+        retrieve from the chat history
+        :return: a string that contains the last `nb_messages` messages from the `self.history` list.
+        Each message is converted to a string using the `get_string_message` method and concatenated
+        with a newline character.
+        """
         historyLength = len(self.history)
         text =""
         for i in range(historyLength-(nb_messages + 1),historyLength):
