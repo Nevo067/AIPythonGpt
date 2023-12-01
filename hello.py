@@ -29,6 +29,7 @@ import json
 from History import HistoryManager
 from DbApi import DbApi
 from UserDao import UserDao
+from ConvDao import ConvDao
 
 
 
@@ -277,7 +278,20 @@ def Connexion():
     else:
         return "Non Connecté"
     
-
+@app.route("/Conv",methods=['POST'])
+def addConv():
+    Dao= ConvDao(mongo_db,"TestAi","Conversation")
+    input_user= request.get_json()
+    return Dao.add_conv(input_user["Nom"])
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)
+
+@app.route("/message",methods=["POST"])
+def addMessage():
+    Dao= ConvDao(mongo_db,"TestAi","Conversation")
+    input_user= request.get_json()
+    if Dao.add_message(input_user["id"],input_user["Text"],input_user["UserId"]) :
+        return "Update"
+    else:
+        return "No-Update"

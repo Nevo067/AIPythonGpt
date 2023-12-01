@@ -38,6 +38,21 @@ class UserDao():
         return newUser
     
     def Is_user_exist(self,login:str,password:str = None):
+        """
+        The function `Is_user_exist` checks if a user with a given login and password exists in a
+        MongoDB collection.
+        
+        :param login: The `login` parameter is a string that represents the username or login name of
+        the user you want to check for existence in the database
+        :type login: str
+        :param password: The password parameter is an optional parameter that represents the password of
+        the user. If a password is provided, it will be used in the query to check if a user with the
+        given login and password exists. If no password is provided, only the login will be used in the
+        query to check if a
+        :type password: str
+        :return: a boolean value. If the user exists in the database, it will return True. Otherwise, it
+        will return False.
+        """
         
         query = {"login":login,"password":password}
         
@@ -51,6 +66,7 @@ class UserDao():
             return True
         else:
             return False
+    
 
 
 
