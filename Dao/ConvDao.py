@@ -70,9 +70,11 @@ class ConvDao():
         date = datetime.datetime.now()
         query = {"_id": ObjectId(idConv)}
         message = {
+            "_id": ObjectId(),
             "Text":message,
             "UserId":idUser,
-            "Date": date
+            "Date": date,
+            
         }
 
         self.db.Open_connection()

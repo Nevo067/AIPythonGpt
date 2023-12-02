@@ -1,0 +1,14 @@
+{
+    $jsonSchema:{
+        bsonType: "object",
+        required:["login","password"],
+        properties:{
+            login:{
+                bsonType:"string"
+            },
+            password:{
+                bsonType:"string"
+            }
+        }
+    }
+}

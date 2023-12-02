@@ -241,20 +241,8 @@ def testL():
         #print(db_chroma.get())
     
 
-
-
-    '''
-    
-    
-    update_document = updateCol["documents"]
-    update_document.append(data["user_input"])
-    update_document.append(rep)
-    #print(update_document);
-    db_chroma.update_document("dee0665f-7e04-11ee-8c73-c87f54925d7e",update_document)
-    #print(history_manager.history)
-    '''
-
     return rep
+
 
 
 #User Routes
