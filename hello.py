@@ -317,7 +317,7 @@ def addConv():
 def testMessage():
     Dao= ConvDao(mongo_db,"TestAi","Conversation")
     input_user= request.get_json()
-    message =Dao.get_message_by_idConv(input_user["id"])
+    message =Dao.get_message_by_idConv(input_user["id"],10)
 
     tab = []
     for x in message:
@@ -327,6 +327,22 @@ def testMessage():
     return dumps(tab)
 
     return "Ajouter"
+
+@app.route("/Messages",methods=["POST"])
+def testMessages():
+    Dao= ConvDao(mongo_db,"TestAi","Conversation")
+    input_user= request.get_json()
+    messages =Dao.get_message_by_idConv_nb(input_user["id"],input_user["indexStart"],input_user["indexEnd"])
+
+    tab = []
+    for x in messages:
+        print(x)
+        tab.append(x)
+    
+    return dumps(tab)
+
+    return "Ajouter"
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001)

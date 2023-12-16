@@ -88,6 +88,14 @@ class ConvDao():
 
         return True
     def get_message_by_idConv(self,id_conv,nb):
+        """
+        The function retrieves a specified number of messages from a conversation based on its ID.
+        
+        :param id_conv: The `id_conv` parameter is the ID of the conversation for which you want to
+        retrieve the messages
+        :param nb: The parameter "nb" is used to specify the number of messages to retrieve from the
+        conversation. It is used in the query to limit the number of messages returned
+        """
 
         self.db.Open_connection()
 
@@ -95,12 +103,26 @@ class ConvDao():
         col = dbN[self.collection_name]
 
         query = {"_id": ObjectId(id_conv)}
-        project={'Message': {'$slice': nb}
-}
+        project={'Message': {'$slice': nb}}
 
         return col.find(query,project)
     
     def get_message_by_idConv_nb(self,id_conv,nb_start,nb_end):
+        """
+        The function retrieves a specific range of messages from a conversation based on the
+        conversation ID.
+        
+        :param id_conv: The `id_conv` parameter is the unique identifier of the conversation for which
+        you want to retrieve messages
+        :param nb_start: The `nb_start` parameter is the starting index of the messages you want to
+        retrieve. It specifies the position of the first message you want to retrieve in the list of
+        messages for the given conversation
+        :param nb_end: The `nb_end` parameter is used to specify the ending index of the range of
+        messages you want to retrieve
+        :return: the result of the find query on the specified collection in the database. The query is
+        searching for a document with the specified `_id` value and then using the `` operator to
+        return a subset of the `Message` array field, starting from `nb_start` and ending at `nb_end`.
+        """
 
         self.db.Open_connection()
 
@@ -108,8 +130,7 @@ class ConvDao():
         col = dbN[self.collection_name]
 
         query = {"_id": ObjectId(id_conv)}
-        project={'Message': {'$slice': [nb_start, nb_end]}
-}
+        project={'Message': {'$slice': [nb_start, nb_end]}}
 
         return col.find(query,project)
 
