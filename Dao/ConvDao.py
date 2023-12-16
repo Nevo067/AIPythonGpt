@@ -87,3 +87,30 @@ class ConvDao():
         self.db.Close_connection()
 
         return True
+    def get_message_by_idConv(self,id_conv,nb):
+
+        self.db.Open_connection()
+
+        dbN = self.db.dbClient[self.databasesName]
+        col = dbN[self.collection_name]
+
+        query = {"_id": ObjectId(id_conv)}
+        project={'Message': {'$slice': nb}
+}
+
+        return col.find(query,project)
+    
+    def get_message_by_idConv_nb(self,id_conv,nb_start,nb_end):
+
+        self.db.Open_connection()
+
+        dbN = self.db.dbClient[self.databasesName]
+        col = dbN[self.collection_name]
+
+        query = {"_id": ObjectId(id_conv)}
+        project={'Message': {'$slice': [nb_start, nb_end]}
+}
+
+        return col.find(query,project)
+
+        

@@ -31,6 +31,7 @@ from DbApi import DbApi
 from UserDao import UserDao
 from ConvDao import ConvDao
 
+from bson.json_util import dumps
 
 
 
@@ -175,6 +176,14 @@ def test():
 
 @app.route("/testL", methods=['POST'])
 def testL():
+    """
+    The `testL` function takes in a JSON object, adds the user input to a history manager, retrieves
+    relevant documents from a database, concatenates the page content of the documents into a single
+    string, transforms the text into a dictionary, uses a conversation model to generate a response,
+    adds the AI response to the history manager, retrieves the last two messages from the history
+    manager, and returns the AI response.
+    :return: The function `testL()` returns the variable `rep`.
+    """
     
     data = request.get_json()
     history_manager.add_humain_message(data["user_input"])
@@ -204,28 +213,6 @@ def testL():
     #print(testH)
     
     # update 
-    '''
-    updateCol["documents"] = update_str;
-
-    doc = Document(page_content=update_str,
-        metadata={
-            "source": "ai",
-            }
-        )
-
-    testH= history_manager.transform_text_to_dict("AI","YOU",update_str)
-
-    ## The `print` function in Python is used to display output on the console. It takes one or more
-    # arguments and prints them as text.
-    #print(updateCol)
-    
-    db_chroma.update_document("dee0665f-7e04-11ee-8c73-c87f54925d7e",doc)
-
-    updateCol = db_chroma.get("dee0665f-7e04-11ee-8c73-c87f54925d7e");
-    updateDoc = updateCol["documents"]
-    #print(updateDoc)
-
-    '''
 
     
     if history_manager.counting(1):
@@ -244,6 +231,60 @@ def testL():
     return rep
 
 
+@app.route("/testC", methods=['POST'])
+def testC():
+    
+    data = request.get_json()
+    history_manager.add_humain_message(data["Text"])
+    
+    #Get text
+    text_doc =""
+    
+    docsQuery = db_chroma.get_relevant_documents(data["Text"])
+    print(docsQuery)
+    
+    for page_content in docsQuery:
+        text_doc += (page_content.page_content+"\n")
+    
+    #Add document to text
+    doc_dict= history_manager.transform_text_to_dict("YOU","AI",text_doc)
+
+    rep = conversation_with_summary.predict(humain_input= data["Text"],tests=text_doc)
+
+    history_manager.add_ai_message(rep)
+
+    newMessage = history_manager.get_two_last_String()
+    #print(updateDoc)
+
+    print(newMessage)
+    
+    
+    #print(testH)
+    
+    # update 
+
+    
+    if history_manager.counting(1):
+        text = history_manager.get_number_message(4)
+        doc = Document(page_content=text,
+            metadata={
+                "source": "test ai",
+                }
+            )
+        doc_list = []
+        doc_list.append(doc)
+        db_chroma.add_documents(documents=doc_list)
+        #print(db_chroma.get())
+    
+
+    Dao= ConvDao(mongo_db,"TestAi","Conversation")
+    input_user= request.get_json()
+    if Dao.add_message(input_user["id"],input_user["Text"],input_user["UserId"]) :
+        Dao.add_message(input_user["id"],rep,input_user["aiId"])
+    
+    jsonText = json.dumps({"text":rep})
+    
+    return jsonText
 
 #User Routes
 
@@ -272,6 +313,21 @@ def addConv():
     input_user= request.get_json()
     return Dao.add_conv(input_user["Nom"])
 
+@app.route("/testMessage",methods=["POST"])
+def testMessage():
+    Dao= ConvDao(mongo_db,"TestAi","Conversation")
+    input_user= request.get_json()
+    message =Dao.get_message_by_idConv(input_user["id"])
+
+    tab = []
+    for x in message:
+        print(x)
+        tab.append(x)
+    
+    return dumps(tab)
+
+    return "Ajouter"
+
 if __name__ == '__main__':
     app.run(debug=True, port=8001)
 
@@ -283,3 +339,4 @@ def addMessage():
         return "Update"
     else:
         return "No-Update"
+
