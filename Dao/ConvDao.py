@@ -107,7 +107,7 @@ class ConvDao():
 
         return col.find(query,project)
     
-    def get_message_by_idConv_nb(self,id_conv,nb_start,nb_end):
+    def get_message_by_idConv_nb(self,id_conv,nb_start,nb_get):
         """
         The function retrieves a specific range of messages from a conversation based on the
         conversation ID.
@@ -130,8 +130,51 @@ class ConvDao():
         col = dbN[self.collection_name]
 
         query = {"_id": ObjectId(id_conv)}
-        project={'Message': {'$slice': [nb_start, nb_end]}}
+        project={'Message': {'$slice': [nb_start, nb_get]}}
 
         return col.find(query,project)
+    
+    def get_nb_message_by_id(self,id_conv):
+        self.db.Open_connection()
+
+        dbN = self.db.dbClient[self.databasesName]
+        col = dbN[self.collection_name]
+
+        query = {"_id": ObjectId(id_conv)}
+        project={ {'$size': "Message"}}
+    
+    def count_nb_message(self,id_conv):
+        final_result = ""
+
+        self.db.Open_connection()
+
+        dbN = self.db.dbClient[self.databasesName]
+        col = dbN[self.collection_name]
+
+        query = {"_id": ObjectId(id_conv)}
+        result = col.aggregate(
+            [
+                {
+                    '$unwind': '$Message'
+                }, {
+                    '$group': {
+                        '_id': 1111, 
+                        'count': {
+                            '$sum': 1
+                        }
+                    }
+                }
+            ]
+        )
+        for count in result:
+            final_result = count
+
+        self.db.Close_connection()
+
+        return final_result
+
+
+    
+
 
         

@@ -313,6 +313,9 @@ def addConv():
     input_user= request.get_json()
     return Dao.add_conv(input_user["Nom"])
 
+#Message
+
+
 @app.route("/testMessage",methods=["POST"])
 def testMessage():
     Dao= ConvDao(mongo_db,"TestAi","Conversation")
@@ -356,3 +359,18 @@ def addMessage():
     else:
         return "No-Update"
 
+@app.route("/countMessage",methods=["POST"])
+def get_nb_message():
+    Dao= ConvDao(mongo_db,"TestAi","Conversation")
+    input_user= request.get_json()
+    return Dao.count_nb_message(input_user["id"])
+
+#URL API AI
+@app.route("/URLAI",methods=["POST"])
+def changeUrl():
+    input_user = request.get_json()
+    #llm = TextGen(input_user["url"])
+    url = input_user["url"]
+    print(url)
+
+    return url

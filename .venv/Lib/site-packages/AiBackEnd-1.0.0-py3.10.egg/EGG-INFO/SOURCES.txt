@@ -1,0 +1,7 @@
+setup.py
+AiBackEnd.egg-info/PKG-INFO
+AiBackEnd.egg-info/SOURCES.txt
+AiBackEnd.egg-info/dependency_links.txt
+AiBackEnd.egg-info/not-zip-safe
+AiBackEnd.egg-info/requires.txt
+AiBackEnd.egg-info/top_level.txt
