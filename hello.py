@@ -8,7 +8,7 @@ from flask import request
 
 from flask_cors import CORS
 
-import chromadb
+
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
